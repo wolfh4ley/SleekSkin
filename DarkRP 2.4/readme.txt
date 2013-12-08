@@ -1,0 +1,1 @@
+Drop this folder into the gamemodes/darkrp/gamemode folder and when prompted, replace the files

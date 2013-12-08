@@ -1115,7 +1115,10 @@ local function OpenRPMenu()
 			icon:SetModel(IconModel)
 			icon:SetSize( 100, 100 )
 			local ent = icon:GetEntity()
-            local headPos = ent:GetBonePosition(ent:LookupBone("ValveBiped.Bip01_Head1"))
+			local headPos
+			if ent:LookupBone("ValveBiped.Bip01_Head1") then
+				headPos = ent:GetBonePosition(ent:LookupBone("ValveBiped.Bip01_Head1"))
+			end
             ent:SetEyeTarget(Vector(20, 00, 65)) -- otherwise the model will have its eyes pointing down
             icon:SetCamPos(Vector(20, 00, 65))
 			if headPos then

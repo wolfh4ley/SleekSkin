@@ -1,8 +1,3 @@
-local VoteVGUI = {}
-local QuestionVGUI = {}
-local PanelNum = 0
-local LetterWritePanel
-
 surface.CreateFont( "fontclose", {
  font = "Cabin",
  size = 14,
@@ -120,335 +115,8 @@ surface.CreateFont( "maxjob", {
  antialias = true
 } )
 
-surface.CreateFont( "VoteFont", {
- font = "Bebas Neue",
- size = 24,
- weight = 500,
- blursize = 0,
- scanlines = 0,
- antialias = true
-} )
+local textOpen = false
 
-surface.CreateFont( "QuestionFont", {
- font = "Myriad Pro",
- size = 14,
- weight = 0,
- blursize = 0,
- scanlines = 0,
- antialias = true
-} )
-
-surface.CreateFont( "TimeFont", {
- font = "Calibri",
- size = 22,
- weight = 0,
- blursize = 0,
- scanlines = 0,
- antialias = true
-} )
-
-surface.CreateFont( "YNButtonFont", {
- font = "Cabin",
- size = 12,
- weight = 500,
- blursize = 0,
- scanlines = 0,
- antialias = true
-} )
-
-local function MsgDoVote(msg)
-	local _, chatY = chat.GetChatBoxPos()
-
-	local question = msg:ReadString()
-	local voteid = msg:ReadShort()
-	local timeleft = msg:ReadFloat()
-	if timeleft == 0 then
-		timeleft = 100
-	end
-	local OldTime = CurTime()
-	if not IsValid(LocalPlayer()) then return end -- Sent right before player initialisation
-
-	LocalPlayer():EmitSound("Town.d1_town_02_elevbell1", 100, 100)
-	local panel = vgui.Create("DFrame")
-	panel:SetPos(3 + PanelNum, chatY - 145)
-	panel:SetTitle("")
-	panel:SetSize(140, 140)
-	panel:SetSizable(false)
-	panel.btnClose:SetVisible(false)
-	panel:SetDraggable(false)
-	panel.Paint = function( self, w, h )
-		
-		draw.RoundedBox( 0, 0, 0, w, h, Color( 224, 224, 224, 255 ) )
-		draw.RoundedBox( 0, 1, 1, w - 2, h - 2, Color( 250, 250, 250, 255 ) )
-		
-		draw.RoundedBox( 0, 0, 0, w, 36, Color( 62, 67, 77 ) )
-		
-		draw.SimpleText( "Job Vote", "VoteFont", 6, 7, Color( 255, 255, 255, 255 ) )
-		
-		surface.SetDrawColor( Color( 84, 89, 100, 255 ) )
-		surface.DrawLine( 1, 1, w - 1, 1 )
-		surface.DrawLine( 1, 1, 1, 20 )
-		surface.DrawLine( 1, 34, w - 1, 34 )
-		surface.DrawLine( w - 1, 1, w - 1, 34 )
-		
-		local time = "Time: ".. tostring(math.Clamp(math.ceil(timeleft - (CurTime() - OldTime)), 0, 9999))
-		draw.SimpleText( time, "VoteFont", w - 6, 7, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT )
-	end
-	function panel:Close()
-		PanelNum = PanelNum - 140
-		VoteVGUI[voteid .. "vote"] = nil
-
-		local num = 0
-		for k,v in SortedPairs(VoteVGUI) do
-			v:SetPos(num, ScrH() / 2 - 50)
-			num = num + 140
-		end
-
-		for k,v in SortedPairs(QuestionVGUI) do
-			v:SetPos(num, ScrH() / 2 - 50)
-			num = num + 300
-		end
-		self:Remove()
-	end
-
-	function panel:Think()
-		--self:SetTitle("Time: ".. tostring(math.Clamp(math.ceil(timeleft - (CurTime() - OldTime)), 0, 9999)))
-		if timeleft - (CurTime() - OldTime) <= 0 then
-			panel:Close()
-		end
-	end
-
-	panel:SetKeyboardInputEnabled(false)
-	panel:SetMouseInputEnabled(true)
-	panel:SetVisible(true)
-
-	for i = 22, string.len(question), 22 do
-		if not string.find(string.sub(question, i - 20, i), "\n", 1, true) then
-			question = string.sub(question, 1, i) .. "\n".. string.sub(question, i + 1, string.len(question))
-		end
-	end
-
-	local label = vgui.Create("DLabel")
-	label:SetParent(panel)
-	label:SetPos(5, 42)
-	label:SetFont( "QuestionFont" )
-	label:SetText(question)
-	label:SetTextColor( Color( 0, 0, 0, 255 ) )
-	label:SizeToContents()
-	label:SetVisible(true)
-
-	local nextHeight = label:GetTall() > 78 and label:GetTall() - 78 or 0 // make panel taller for divider and buttons
-	panel:SetTall(panel:GetTall() + nextHeight)
-
-	local ybutton = vgui.Create("Button")
-	ybutton:SetParent(panel)
-	ybutton:SetPos(25, panel:GetTall() - 25)
-	ybutton:SetSize(40, 20)
-	ybutton:SetCommand("!")
-	ybutton:SetText("Yes")
-	ybutton:SetTextColor( Color(255,255,255) )
-	ybutton:SetVisible(true)
-	ybutton.Paint = function( self, w, h )
-		local gcol
-		if self.hover then
-			gcol = Color( 36, 190, 255 )
-		else
-			gcol = Color( 36, 165, 221 )
-		end
-		draw.RoundedBox( 0, 0, 0, w, h, Color( 16, 96, 130 ) )
-		draw.RoundedBox( 0, 1, 1, w - 2, h - 2, gcol )
-	end
-	ybutton.DoClick = function()
-		LocalPlayer():ConCommand("vote " .. voteid .. " yea\n")
-		panel:Close()
-	end
-
-	local nbutton = vgui.Create("Button")
-	nbutton:SetParent(panel)
-	nbutton:SetPos(70, panel:GetTall() - 25)
-	nbutton:SetSize(40, 20)
-	nbutton:SetCommand("!")
-	nbutton:SetText("No")
-	nbutton:SetTextColor( Color(255,255,255) )
-	nbutton:SetVisible(true)
-	nbutton.Paint = function( self, w, h )
-		local gcol
-		if self.hover then
-			gcol = Color( 36, 190, 255 )
-		else
-			gcol = Color( 36, 165, 221 )
-		end
-		draw.RoundedBox( 0, 0, 0, w, h, Color( 16, 96, 130 ) )
-		draw.RoundedBox( 0, 1, 1, w - 2, h - 2, gcol )
-	end
-	nbutton.DoClick = function()
-		LocalPlayer():ConCommand("vote " .. voteid .. " nay\n")
-		panel:Close()
-	end
-
-	PanelNum = PanelNum + 140
-	VoteVGUI[voteid .. "vote"] = panel
-	panel:SetSkin(GAMEMODE.Config.DarkRPSkin)
-end
-usermessage.Hook("DoVote", MsgDoVote)
-
-local function KillVoteVGUI(msg)
-	local id = msg:ReadShort()
-
-	if VoteVGUI[id .. "vote"] and VoteVGUI[id .. "vote"]:IsValid() then
-		VoteVGUI[id.."vote"]:Close()
-
-	end
-end
-usermessage.Hook("KillVoteVGUI", KillVoteVGUI)
-
-local function MsgDoQuestion(msg)
-	local question = msg:ReadString()
-	local quesid = msg:ReadString()
-	local timeleft = msg:ReadFloat()
-	if timeleft == 0 then
-		timeleft = 100
-	end
-	local OldTime = CurTime()
-	LocalPlayer():EmitSound("Town.d1_town_02_elevbell1", 100, 100)
-	local panel = vgui.Create("DFrame")
-	panel:SetPos(3 + PanelNum, ScrH() / 2 - 50)--Times 140 because if the quesion is the second screen, the first screen is always a vote screen.
-	panel:SetSize(300, 140)
-	panel:SetSizable(false)
-	panel.btnClose:SetVisible(false)
-	panel:SetKeyboardInputEnabled(false)
-	panel:SetMouseInputEnabled(true)
-	panel:SetVisible(true)
-
-	function panel:Close()
-		PanelNum = PanelNum - 300
-		QuestionVGUI[quesid .. "ques"] = nil
-		local num = 0
-		for k,v in SortedPairs(VoteVGUI) do
-			v:SetPos(num, ScrH() / 2 - 50)
-			num = num + 140
-		end
-
-		for k,v in SortedPairs(QuestionVGUI) do
-			v:SetPos(num, ScrH() / 2 - 50)
-			num = num + 300
-		end
-
-		self:Remove()
-	end
-
-	function panel:Think()
-		self:SetTitle("Time: ".. tostring(math.Clamp(math.ceil(timeleft - (CurTime() - OldTime)), 0, 9999)))
-		if timeleft - (CurTime() - OldTime) <= 0 then
-			panel:Close()
-		end
-	end
-
-	local label = vgui.Create("DLabel")
-	label:SetParent(panel)
-	label:SetPos(5, 30)
-	label:SetSize(380, 40)
-	label:SetText(question)
-	label:SetVisible(true)
-
-	local divider = vgui.Create("Divider")
-	divider:SetParent(panel)
-	divider:SetPos(2, 80)
-	divider:SetSize(380, 2)
-	divider:SetVisible(true)
-
-	local ybutton = vgui.Create("DButton")
-	ybutton:SetParent(panel)
-	ybutton:SetPos(105, 100)
-	ybutton:SetSize(40, 20)
-	ybutton:SetText("Yes")
-	ybutton:SetVisible(true)
-	ybutton.DoClick = function()
-		LocalPlayer():ConCommand("ans " .. quesid .. " 1\n")
-		panel:Close()
-	end
-
-	local nbutton = vgui.Create("DButton")
-	nbutton:SetParent(panel)
-	nbutton:SetPos(155, 100)
-	nbutton:SetSize(40, 20)
-	nbutton:SetText("No")
-	nbutton:SetVisible(true)
-	nbutton.DoClick = function()
-		LocalPlayer():ConCommand("ans " .. quesid .. " 2\n")
-		panel:Close()
-	end
-
-	PanelNum = PanelNum + 300
-	QuestionVGUI[quesid .. "ques"] = panel
-
-	panel:SetSkin(GAMEMODE.Config.DarkRPSkin)
-end
-usermessage.Hook("DoQuestion", MsgDoQuestion)
-
-local function KillQuestionVGUI(msg)
-	local id = msg:ReadString()
-
-	if QuestionVGUI[id .. "ques"] and QuestionVGUI[id .. "ques"]:IsValid() then
-		QuestionVGUI[id .. "ques"]:Close()
-	end
-end
-usermessage.Hook("KillQuestionVGUI", KillQuestionVGUI)
-
-local function DoVoteAnswerQuestion(ply, cmd, args)
-	if not args[1] then return end
-
-	local vote = 0
-	if tonumber(args[1]) == 1 or string.lower(args[1]) == "yes" or string.lower(args[1]) == "true" then vote = 1 end
-
-	for k,v in pairs(VoteVGUI) do
-		if ValidPanel(v) then
-			local ID = string.sub(k, 1, -5)
-			VoteVGUI[k]:Close()
-			RunConsoleCommand("vote", ID, vote)
-			return
-		end
-	end
-
-	for k,v in pairs(QuestionVGUI) do
-		if ValidPanel(v) then
-			local ID = string.sub(k, 1, -5)
-			QuestionVGUI[k]:Close()
-			RunConsoleCommand("ans", ID, vote)
-			return
-		end
-	end
-end
-concommand.Add("rp_vote", DoVoteAnswerQuestion)
-
-local function DoLetter(msg)
-	LetterWritePanel = vgui.Create("Frame")
-	LetterWritePanel:SetPos(ScrW() / 2 - 75, ScrH() / 2 - 100)
-	LetterWritePanel:SetSize(150, 200)
-	LetterWritePanel:SetMouseInputEnabled(true)
-	LetterWritePanel:SetKeyboardInputEnabled(true)
-	LetterWritePanel:SetVisible(true)
-end
-usermessage.Hook("DoLetter", DoLetter)
-
-local F4Menu
-local F4MenuTabs
-local F4Tabs = {}
-local hasReleasedF4 = false
-function GM:addF4MenuTab(name, tabControl, icon)
-	return table.insert(F4Tabs, {name = name, ctrl = tabControl, icon = icon})
-end
-
-function GM:switchTabOrder(from, to)
-	F4Tabs[from], F4Tabs[to] = F4Tabs[to], F4Tabs[from]
-end
-
-function GM:removeTab(tabNr)
-	if ValidPanel(F4Tabs[tabNr].ctrl) then
-		F4Tabs[tabNr].ctrl:Remove()
-	end
-	table.remove(F4Tabs, tabNr)
-end
 
 function OpenTextBox( text1, text2, cmd )
 	
@@ -758,15 +426,50 @@ function OpenPlyReasonBox( text1, text2, text3, cmd )
 	end
 end
 
+local entOpen
+
+function WrapText(text, width, font) -- Credit goes to BKU for this function!
+        surface.SetFont(font)
+
+        -- Any wrapping required?
+        local w, _ = surface.GetTextSize(text)
+        if w < width then
+                return {text} -- Nope, but wrap in table for uniformity
+        end
+   
+        local words = string.Explode(" ", text) -- No spaces means you're screwed
+
+        local lines = {""}
+        for i, wrd in pairs(words) do
+                local l = #lines
+                local added = lines[l] .. " " .. wrd
+                if l == 0 then
+                        added = wrd
+                end
+                w, _ = surface.GetTextSize(added)
+
+                if w > width then
+                        -- New line needed
+                        table.insert(lines, wrd)
+                else
+                        -- Safe to tack it on
+                        lines[l] = added
+                end
+        end
+
+        return lines
+end
+
+
+
+/*---------------------------------------------------------------------------
+F4 tab sheet
+---------------------------------------------------------------------------*/
 local function MakeButtons( )
 	local man = vgui.Create( "DFrame" )
 	man:SetSize( 500, 140 )
 	man:Center()
 	man:MakePopup()
-end
-
-local function firstToUpper(str)
-    return (string.gsub( str, "^%l", string.upper))
 end
 
 function Pass()
@@ -785,7 +488,8 @@ local function HasStuff( list )
 		
 local BACKGROUND
 
-local function ChangeJobVGUI()
+function OpenRPMenu()
+
 	isOpen = true
 
 	local jobs = team.GetAllTeams()
@@ -1184,9 +888,9 @@ local function ChangeJobVGUI()
 			end
 		end
 		
-		if table.HasValue( AccessToCPCmds, LocalPlayer():Team() ) then
+		if table.HasValue( AccessToCPCmds, team.GetName(LocalPlayer():Team()) ) then
 			OpenCPCmds()
-		elseif table.HasValue( AccessToMayorCmds, LocalPlayer():Team() ) then
+		elseif table.HasValue( AccessToMayorCmds, team.GetName(LocalPlayer():Team()) ) then
 			OpenMayorCmds()
 		end
 		
@@ -1408,10 +1112,7 @@ local function ChangeJobVGUI()
 			icon:SetModel(IconModel)
 			icon:SetSize( 100, 100 )
 			local ent = icon:GetEntity()
-			local headPos
-			if ent:LookupBone("ValveBiped.Bip01_Head1") then
-				headPos = ent:GetBonePosition(ent:LookupBone("ValveBiped.Bip01_Head1"))
-			end
+            local headPos = ent:GetBonePosition(ent:LookupBone("ValveBiped.Bip01_Head1"))
             ent:SetEyeTarget(Vector(20, 00, 65)) -- otherwise the model will have its eyes pointing down
             icon:SetCamPos(Vector(20, 00, 65))
 			if headPos then
@@ -1643,11 +1344,10 @@ local function ChangeJobVGUI()
 			end
 			
 			if v.vote or v.RequiresVote and v.RequiresVote(LocalPlayer(), v.team) then
-				afj:SetText("Create Vote")
+				afj:SetText(DarkRP.getPhrase("create_vote_for_job"))
 			end
 			
 			main:AddItem( jobc )
-			
 		end
 
 		for key, job in pairs( RPExtraTeams ) do
@@ -1939,11 +1639,11 @@ local function ChangeJobVGUI()
 				if ent.max then
 					RunConsoleCommand( "DarkRP", ent.cmd )
 				elseif ent.noship == false then
-					RunConsoleCommand( "say", "/buyshipment "..ent.name )
+					RunConsoleCommand( "DarkRP", "buyshipment", ent.name )
 				elseif ent.noship then
 					RunConsoleCommand( "say", "/buy "..ent.name )
 				elseif table.HasValue( GAMEMODE.AmmoTypes, ent ) then
-					RunConsoleCommand( "say", "/buyammo "..ent.ammoType )
+					RunConsoleCommand( "DarkRP", "buyammo", ent.ammoType )
 				elseif table.HasValue( CustomVehicles, ent ) then
 					RunConsoleCommand( "DarkRP", "buyvehicle", ent.name )
 				end
@@ -2533,426 +2233,9 @@ local function ChangeJobVGUI()
 		jobOpen = false
 	end
 	OpenCmds()
-end
-GM.ShowSpare2 = ChangeJobVGUI
-
-surface.CreateFont( "DoorButtonFont", {
- font = "Bebas Neue",
- size = 24,
- weight = 500,
- blursize = 0,
- scanlines = 0,
- antialias = true
-} )
-
-local KeyFrameVisible = false
-local function KeysMenu(um)
-	local Vehicle = LocalPlayer():GetEyeTrace().Entity
-	Vehicle = IsValid(Vehicle) and Vehicle:IsVehicle()
-	if KeyFrameVisible then return end
-	local trace = LocalPlayer():GetEyeTrace()
-	local Frame = vgui.Create("DFrame")
-	KeyFrameVisible = true
-	Frame:SetSize(200, 230)
-	Frame:Center()
-	Frame:SetVisible(true)
-	Frame:ShowCloseButton( false )
-	Frame:MakePopup()
-	Frame.Paint = function( self, w, h )
-		
-		draw.RoundedBox( 0, 0, 0, w, h, Color( 224, 224, 224, 255 ) )
-		draw.RoundedBox( 0, 1, 1, w - 2, h - 2, Color( 250, 250, 250, 255 ) )
-		
-		draw.RoundedBox( 0, 0, 0, w, 36, Color( 62, 67, 77 ) )
-		
-		draw.SimpleText( "Door Options", "VoteFont", 10, 7, Color( 255, 255, 255, 255 ) )
-		
-		surface.SetDrawColor( Color( 84, 89, 100, 255 ) )
-		surface.DrawLine( 1, 1, w - 1, 1 )
-		surface.DrawLine( 1, 1, 1, 34 )
-		surface.DrawLine( 1, 34, w - 1, 34 )
-		surface.DrawLine( w - 1, 1, w - 1, 34 )
-	end
-
-	function Frame:Think()
-		local ent = LocalPlayer():GetEyeTrace().Entity
-		if not IsValid(ent) or (not ent:IsDoor() and not ent:IsVehicle()) or ent:GetPos():Distance(LocalPlayer():GetPos()) > 200 then
-			self:Close()
-		end
-		if (!self.Dragging) then return end
-		local x = gui.MouseX() - self.Dragging[1]
-		local y = gui.MouseY() - self.Dragging[2]
-		x = math.Clamp( x, 0, ScrW() - self:GetWide() )
-		y = math.Clamp( y, 0, ScrH() - self:GetTall() )
-		self:SetPos( x, y )
-	end
-	local Entiteh = "door"
-	if Vehicle then
-		Entiteh = "vehicle"
-	end
-	Frame:SetTitle("")
-
-	function Frame:Close()
-		KeyFrameVisible = false
-		self:SetVisible( false )
-		self:Remove()
-	end
 	
-	local cl = vgui.Create( "DButton", Frame )
-	cl:SetSize( 50, 20 )
-	cl:SetPos( Frame:GetWide() - 60, 0 )
-	cl:SetText( "X" )
-	cl:SetFont( "fontclose" )
-	cl:SetTextColor( Color( 255, 255, 255, 255 ) )
-	cl.Paint = function( self, w, h )
-		local kcol
-		if self.hover then
-			kcol = Color( 255, 150, 150, 255 )
-		else
-			kcol = Color( 175, 100, 100 )
-		end
-		draw.RoundedBoxEx( 0, 0, 0, w, h, Color( 255, 150, 150, 255 ), false, false, true, true )
-		draw.RoundedBoxEx( 0, 1, 0, w - 2, h - 1, kcol, false, false, true, true )
-	end
-	cl.DoClick = function()
-		Frame:Close()
-	end
-	cl.OnCursorEntered = function( self )
-		self.hover = true
-	end
-	cl.OnCursorExited = function( self )
-		self.hover = false
-	end
-
-	if not IsValid(trace.Entity) then Frame:Close() return end
-	if trace.Entity:OwnedBy(LocalPlayer()) then
-		if not trace.Entity.DoorData then return end -- Don't open the menu when the door settings are not loaded yet
-		local Owndoor = vgui.Create("DButton", Frame)
-		Owndoor:SetPos(10, 30 + 14)
-		Owndoor:SetSize(182, 40)
-		Owndoor:SetText("Sell " .. Entiteh)
-		Owndoor:SetFont( "DoorButtonFont" )
-		Owndoor:SetTextColor(Color(255, 255, 255, 255))
-		Owndoor.Paint = function( self, w, h )
-		local gcol
-				if self.hover then
-					gcol = Color( 36, 190, 255 )
-				else
-					gcol = Color( 26, 160, 212 )
-				end
-				draw.RoundedBox( 0, 0, 0, w, h, Color( 22, 131, 173 ) )
-				draw.RoundedBox( 0, 1, 1, w - 2, h - 2, gcol )
-				
-				surface.SetDrawColor( Color( 31, 191, 255, 255 ) )
-				surface.DrawLine( 1, 1, w - 1, 1 )
-				surface.DrawLine( 1, 1, 1, 40 )
-				surface.DrawLine( 1, 38, w - 1, 38 )
-				surface.DrawLine( w - 2, 1, w - 2, 40 )
-		end
-		Owndoor.DoClick = function() RunConsoleCommand("darkrp", "/toggleown") Frame:Close() end
-		Owndoor.OnCursorEntered = function( self ) self.hover = true end
-		Owndoor.OnCursorExited = function( self ) self.hover = false end
-
-		local AddOwner = vgui.Create("DButton", Frame)
-		AddOwner:SetPos(10, 75+ 14)
-		AddOwner:SetSize(182, 40)
-		AddOwner:SetText("Add owner")
-		AddOwner:SetFont( "DoorButtonFont" )
-		AddOwner:SetTextColor(Color(255, 255, 255, 255))
-		AddOwner.Paint = function( self, w, h )
-		local gcol
-				if self.hover then
-					gcol = Color( 36, 190, 255 )
-				else
-					gcol = Color( 26, 160, 212 )
-				end
-				draw.RoundedBox( 0, 0, 0, w, h, Color( 22, 131, 173 ) )
-				draw.RoundedBox( 0, 1, 1, w - 2, h - 2, gcol )
-				
-				surface.SetDrawColor( Color( 31, 191, 255, 255 ) )
-				surface.DrawLine( 1, 1, w - 1, 1 )
-				surface.DrawLine( 1, 1, 1, 40 )
-				surface.DrawLine( 1, 38, w - 1, 38 )
-				surface.DrawLine( w - 2, 1, w - 2, 40 )
-		end
-		AddOwner.DoClick = function()
-			local menu = DermaMenu()
-			menu.found = false
-			for k,v in pairs(player.GetAll()) do
-				if not trace.Entity:OwnedBy(v) and not trace.Entity:AllowedToOwn(v) then
-					menu.found = true
-					menu:AddOption(v:Nick(), function() RunConsoleCommand("darkrp", "/ao", v:SteamID()) end)
-				end
-			end
-			if not menu.found then
-				menu:AddOption("None available", function() end)
-			end
-			menu:Open()
-		end
-		AddOwner.OnCursorEntered = function( self ) self.hover = true end
-		AddOwner.OnCursorExited = function( self ) self.hover = false end
-
-		local RemoveOwner = vgui.Create("DButton", Frame)
-		RemoveOwner:SetPos(10, 120+ 14)
-		RemoveOwner:SetSize(182, 40)
-		RemoveOwner:SetText("Remove owner")
-		RemoveOwner:SetFont( "DoorButtonFont" )
-		RemoveOwner:SetTextColor(Color(255, 255, 255, 255))
-		RemoveOwner.Paint = function( self, w, h )
-		local gcol
-				if self.hover then
-					gcol = Color( 36, 190, 255 )
-				else
-					gcol = Color( 26, 160, 212 )
-				end
-				draw.RoundedBox( 0, 0, 0, w, h, Color( 22, 131, 173 ) )
-				draw.RoundedBox( 0, 1, 1, w - 2, h - 2, gcol )
-				
-				surface.SetDrawColor( Color( 31, 191, 255, 255 ) )
-				surface.DrawLine( 1, 1, w - 1, 1 )
-				surface.DrawLine( 1, 1, 1, 40 )
-				surface.DrawLine( 1, 38, w - 1, 38 )
-				surface.DrawLine( w - 2, 1, w - 2, 40 )
-		end
-		RemoveOwner.DoClick = function()
-			local menu = DermaMenu()
-			for k,v in pairs(player.GetAll()) do
-				if (trace.Entity:OwnedBy(v) and not trace.Entity:IsMasterOwner(v)) or trace.Entity:AllowedToOwn(v) then
-					menu.found = true
-					menu:AddOption(v:Nick(), function() RunConsoleCommand("darkrp", "/ro", v:SteamID()) end)
-				end
-			end
-			if not menu.found then
-				menu:AddOption("None available", function() end)
-			end
-			menu:Open()
-		end
-		RemoveOwner.OnCursorEntered = function( self ) self.hover = true end
-		RemoveOwner.OnCursorExited = function( self ) self.hover = false end
-
-		local DoorTitle = vgui.Create("DButton", Frame)
-		DoorTitle:SetPos(10, 165+ 14)
-		DoorTitle:SetSize(182, 40)
-		DoorTitle:SetFont( "DoorButtonFont" )
-		DoorTitle:SetTextColor(Color(255, 255, 255, 255))
-		DoorTitle:SetText("Set "..Entiteh.." title")
-		if not trace.Entity:IsMasterOwner(LocalPlayer()) then
-			RemoveOwner.m_bDisabled = true
-		end
-		DoorTitle.Paint = function( self, w, h )
-		local gcol
-				if self.hover then
-					gcol = Color( 36, 190, 255 )
-				else
-					gcol = Color( 26, 160, 212 )
-				end
-				draw.RoundedBox( 0, 0, 0, w, h, Color( 22, 131, 173 ) )
-				draw.RoundedBox( 0, 1, 1, w - 2, h - 2, gcol )
-				
-				surface.SetDrawColor( Color( 31, 191, 255, 255 ) )
-				surface.DrawLine( 1, 1, w - 1, 1 )
-				surface.DrawLine( 1, 1, 1, 40 )
-				surface.DrawLine( 1, 38, w - 1, 38 )
-				surface.DrawLine( w - 2, 1, w - 2, 40 )
-		end
-		DoorTitle.DoClick = function()
-			Derma_StringRequest("Set door title", "Set the title of the "..Entiteh.." you're looking at", "", function(text)
-				RunConsoleCommand("darkrp", "/title", text)
-				if ValidPanel(Frame) then
-					Frame:Close()
-				end
-			end,
-			function() end, "OK!", "CANCEL!")
-		end
-		DoorTitle.OnCursorEntered = function( self ) self.hover = true end
-		DoorTitle.OnCursorExited = function( self ) self.hover = false end
-
-		if (FAdmin and FAdmin.Access.PlayerHasPrivilege(LocalPlayer(), "rp_doorManipulation") or LocalPlayer():IsAdmin()) and not Vehicle then
-			Frame:SetSize(200, Frame:GetTall() + 110)
-			local SetCopsOnly = vgui.Create("DButton", Frame)
-			SetCopsOnly:SetPos(10, Frame:GetTall() - 110)
-			SetCopsOnly:SetSize(180, 100)
-			SetCopsOnly:SetText("Edit Door Group")
-			SetCopsOnly.DoClick = function()
-				local menu = DermaMenu()
-				local groups = menu:AddSubMenu("Door Groups")
-				local teams = menu:AddSubMenu("Jobs")
-				local add = teams:AddSubMenu("Add")
-				local remove = teams:AddSubMenu("Remove")
-
-				menu:AddOption("None", function() RunConsoleCommand("darkrp", "/togglegroupownable") Frame:Close() end)
-				for k,v in pairs(RPExtraTeamDoors) do
-					groups:AddOption(k, function() RunConsoleCommand("darkrp", "/togglegroupownable", k) Frame:Close() end)
-				end
-
-				if not trace.Entity.DoorData then return end
-
-				for k,v in pairs(RPExtraTeams) do
-					if not trace.Entity.DoorData.TeamOwn or not trace.Entity.DoorData.TeamOwn[k] then
-						add:AddOption( v.name, function() RunConsoleCommand("darkrp", "/toggleteamownable", k) Frame:Close() end )
-					else
-						remove:AddOption( v.name, function() RunConsoleCommand("darkrp", "/toggleteamownable", k) Frame:Close() end )
-					end
-				end
-
-				menu:Open()
-			end
-		end
-	elseif not trace.Entity:OwnedBy(LocalPlayer()) and trace.Entity:IsOwnable() and not trace.Entity:IsOwned() and not trace.Entity.DoorData.NonOwnable then
-		if not trace.Entity.DoorData.GroupOwn then
-			Frame:SetSize(200, 140)
-			local Owndoor = vgui.Create("DButton", Frame)
-			Owndoor:SetPos(10, 30)
-			Owndoor:SetSize(180, 100)
-			Owndoor:SetText("Buy " .. Entiteh)
-			Owndoor.DoClick = function() RunConsoleCommand("darkrp", "/toggleown") Frame:Close() end
-		end
-
-		if (FAdmin and FAdmin.Access.PlayerHasPrivilege(LocalPlayer(), "rp_doorManipulation") or LocalPlayer():IsAdmin()) then
-			if trace.Entity.DoorData.GroupOwn then
-				Frame:SetSize(200, 250)
-			else
-				Frame:SetSize(200, 360)
-			end
-
-			local DisableOwnage = vgui.Create("DButton", Frame)
-			DisableOwnage:SetPos(10, Frame:GetTall() - 220)
-			DisableOwnage:SetSize(180, 100)
-			DisableOwnage:SetText("Disallow ownership")
-			DisableOwnage.DoClick = function() Frame:Close() RunConsoleCommand("darkrp", "/toggleownable") end
-
-			local SetCopsOnly = vgui.Create("DButton", Frame)
-			SetCopsOnly:SetPos(10, Frame:GetTall() - 110)
-			SetCopsOnly:SetSize(180, 100)
-			SetCopsOnly:SetText("Edit Door Group")
-			SetCopsOnly.DoClick = function()
-				local menu = DermaMenu()
-				local groups = menu:AddSubMenu("Door Groups")
-				local teams = menu:AddSubMenu("Jobs")
-				local add = teams:AddSubMenu("Add")
-				local remove = teams:AddSubMenu("Remove")
-
-				menu:AddOption("None", function() RunConsoleCommand("darkrp", "/togglegroupownable") Frame:Close() end)
-				for k,v in pairs(RPExtraTeamDoors) do
-					groups:AddOption(k, function() RunConsoleCommand("darkrp", "/togglegroupownable", k) Frame:Close() end)
-				end
-
-				if not trace.Entity.DoorData then return end
-
-				for k,v in pairs(RPExtraTeams) do
-					if not trace.Entity.DoorData.TeamOwn or not trace.Entity.DoorData.TeamOwn[k] then
-						add:AddOption(v.name, function() RunConsoleCommand("darkrp", "/toggleteamownable", k) if Frame.Close then Frame:Close() end end)
-					else
-						remove:AddOption(v.name, function() RunConsoleCommand("darkrp", "/toggleteamownable", k) Frame:Close() end)
-					end
-				end
-
-				menu:Open()
-			end
-		elseif not trace.Entity.DoorData.GroupOwn then
-			RunConsoleCommand("darkrp", "/toggleown")
-			Frame:Close()
-			KeyFrameVisible = true
-			timer.Simple(0.3, function() KeyFrameVisible = false end)
-		end
-	elseif not trace.Entity:OwnedBy(LocalPlayer()) and trace.Entity:AllowedToOwn(LocalPlayer()) then
-		Frame:SetSize(200, 140)
-		local Owndoor = vgui.Create("DButton", Frame)
-		Owndoor:SetPos(10, 30)
-		Owndoor:SetSize(180, 100)
-		Owndoor:SetText("Co-own " .. Entiteh)
-		Owndoor.DoClick = function() RunConsoleCommand("darkrp", "/toggleown") Frame:Close() end
-
-		if (FAdmin and FAdmin.Access.PlayerHasPrivilege(LocalPlayer(), "rp_doorManipulation") or LocalPlayer():IsAdmin()) then
-			Frame:SetSize(200, Frame:GetTall() + 110)
-			local SetCopsOnly = vgui.Create("DButton", Frame)
-			SetCopsOnly:SetPos(10, Frame:GetTall() - 110)
-			SetCopsOnly:SetSize(180, 100)
-			SetCopsOnly:SetText("Edit Door Group")
-			SetCopsOnly.DoClick = function()
-				local menu = DermaMenu()
-				local groups = menu:AddSubMenu("Door Groups")
-				local teams = menu:AddSubMenu("Jobs")
-				local add = teams:AddSubMenu("Add")
-				local remove = teams:AddSubMenu("Remove")
-
-				menu:AddOption("None", function() RunConsoleCommand("darkrp", "/togglegroupownable") Frame:Close() end)
-				for k,v in pairs(RPExtraTeamDoors) do
-					groups:AddOption(k, function() RunConsoleCommand("darkrp", "/togglegroupownable", k) Frame:Close() end)
-				end
-
-				if not trace.Entity.DoorData then return end
-
-				for k,v in pairs(RPExtraTeams) do
-					if not trace.Entity.DoorData.TeamOwn or not trace.Entity.DoorData.TeamOwn[k] then
-						add:AddOption( v.name, function() RunConsoleCommand("darkrp", "/toggleteamownable", k) Frame:Close() end )
-					else
-						remove:AddOption( v.name, function() RunConsoleCommand("darkrp", "/toggleteamownable", k) Frame:Close() end )
-					end
-				end
-
-				menu:Open()
-			end
-		else
-			RunConsoleCommand("darkrp", "/toggleown")
-			Frame:Close()
-			KeyFrameVisible = true
-			timer.Simple(0.3, function() KeyFrameVisible = false end)
-		end
-	elseif (FAdmin and FAdmin.Access.PlayerHasPrivilege(LocalPlayer(), "rp_doorManipulation") or LocalPlayer():IsAdmin()) and trace.Entity.DoorData.NonOwnable then
-		Frame:SetSize(200, 250)
-		local EnableOwnage = vgui.Create("DButton", Frame)
-		EnableOwnage:SetPos(10, 30)
-		EnableOwnage:SetSize(180, 100)
-		EnableOwnage:SetText("Allow ownership")
-		EnableOwnage.DoClick = function() Frame:Close() RunConsoleCommand("darkrp", "/toggleownable") end
-
-		local DoorTitle = vgui.Create("DButton", Frame)
-		DoorTitle:SetPos(10, Frame:GetTall() - 110)
-		DoorTitle:SetSize(180, 100)
-		DoorTitle:SetText("Set "..Entiteh.." title")
-		DoorTitle.DoClick = function()
-			Derma_StringRequest("Set door title", "Set the title of the "..Entiteh.." you're looking at", "", function(text) RunConsoleCommand("darkrp", "/title", text) Frame:Close() end, function() end, "OK!", "CANCEL!")
-		end
-	elseif (FAdmin and FAdmin.Access.PlayerHasPrivilege(LocalPlayer(), "rp_doorManipulation") or LocalPlayer():IsAdmin()) and not trace.Entity:OwnedBy(LocalPlayer()) and trace.Entity:IsOwned() and not trace.Entity:AllowedToOwn(LocalPlayer()) then
-		Frame:SetSize(200, 250)
-		local DisableOwnage = vgui.Create("DButton", Frame)
-		DisableOwnage:SetPos(10, 30)
-		DisableOwnage:SetSize(180, 100)
-		DisableOwnage:SetText("Disallow ownership")
-		DisableOwnage.DoClick = function() Frame:Close() RunConsoleCommand("darkrp", "/toggleownable") end
-
-		local SetCopsOnly = vgui.Create("DButton", Frame)
-		SetCopsOnly:SetPos(10, Frame:GetTall() - 110)
-		SetCopsOnly:SetSize(180, 100)
-		SetCopsOnly:SetText("Edit Door Group")
-			SetCopsOnly.DoClick = function()
-				local menu = DermaMenu()
-				local groups = menu:AddSubMenu("Door Groups")
-				local teams = menu:AddSubMenu("Jobs")
-				local add = teams:AddSubMenu("Add")
-				local remove = teams:AddSubMenu("Remove")
-
-				if not trace.Entity.DoorData then return end
-
-				menu:AddOption("None", function() RunConsoleCommand("darkrp", "/togglegroupownable") Frame:Close() end)
-				for k,v in pairs(RPExtraTeamDoors) do
-					groups:AddOption(k, function() RunConsoleCommand("darkrp", "/togglegroupownable", k) Frame:Close() end)
-				end
-
-				for k,v in pairs(RPExtraTeams) do
-					if not trace.Entity.DoorData.TeamOwn or not trace.Entity.DoorData.TeamOwn[k] then
-						add:AddOption( v.name, function() RunConsoleCommand("darkrp", "/toggleteamownable", k) Frame:Close() end )
-					else
-						remove:AddOption( v.name, function() RunConsoleCommand("darkrp", "/toggleteamownable", k) Frame:Close() end )
-					end
-				end
-
-				menu:Open()
-			end
-	else
-		Frame:Close()
-	end
 end
-GM.ShowTeam = KeysMenu
-usermessage.Hook("KeysMenu", KeysMenu)
+
+timer.Simple(0.7, function()
+	GAMEMODE.ShowSpare2 = OpenRPMenu
+end)

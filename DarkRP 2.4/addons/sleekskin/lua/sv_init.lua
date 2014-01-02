@@ -1,0 +1,1 @@
+resource.AddFile("resource/font/bebasneue.ttf")

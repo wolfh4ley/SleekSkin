@@ -1,6 +1,3 @@
-/*---------------------------------------------------------------------------
-F4 tab
----------------------------------------------------------------------------*/
 surface.CreateFont( "fontclose", {
  font = "Cabin",
  size = 14,
@@ -491,7 +488,7 @@ local function HasStuff( list )
 		
 local BACKGROUND
 
-local function OpenRPMenu()
+function OpenRPMenu()
 
 	isOpen = true
 
@@ -891,9 +888,9 @@ local function OpenRPMenu()
 			end
 		end
 		
-		if table.HasValue( AccessToCPCmds, LocalPlayer():Team() ) then
+		if table.HasValue( AccessToCPCmds, team.GetName(LocalPlayer():Team()) ) then
 			OpenCPCmds()
-		elseif table.HasValue( AccessToMayorCmds, LocalPlayer():Team() ) then
+		elseif table.HasValue( AccessToMayorCmds, team.GetName(LocalPlayer():Team()) ) then
 			OpenMayorCmds()
 		end
 		
@@ -1115,10 +1112,7 @@ local function OpenRPMenu()
 			icon:SetModel(IconModel)
 			icon:SetSize( 100, 100 )
 			local ent = icon:GetEntity()
-			local headPos
-			if ent:LookupBone("ValveBiped.Bip01_Head1") then
-				headPos = ent:GetBonePosition(ent:LookupBone("ValveBiped.Bip01_Head1"))
-			end
+            local headPos = ent:GetBonePosition(ent:LookupBone("ValveBiped.Bip01_Head1"))
             ent:SetEyeTarget(Vector(20, 00, 65)) -- otherwise the model will have its eyes pointing down
             icon:SetCamPos(Vector(20, 00, 65))
 			if headPos then
@@ -1350,7 +1344,7 @@ local function OpenRPMenu()
 			end
 			
 			if v.vote or v.RequiresVote and v.RequiresVote(LocalPlayer(), v.team) then
-				afj:SetText(DarkRP.getPhrase("create_vote_for_job"))
+				afj:SetText("Create Vote")
 			end
 			
 			main:AddItem( jobc )
@@ -1645,11 +1639,11 @@ local function OpenRPMenu()
 				if ent.max then
 					RunConsoleCommand( "DarkRP", ent.cmd )
 				elseif ent.noship == false then
-					RunConsoleCommand( "DarkRP", "buyshipment", ent.name )
+					RunConsoleCommand( "say", "/buyshipment "..ent.name )
 				elseif ent.noship then
 					RunConsoleCommand( "say", "/buy "..ent.name )
 				elseif table.HasValue( GAMEMODE.AmmoTypes, ent ) then
-					RunConsoleCommand( "DarkRP", "buyammo", ent.ammoType )
+					RunConsoleCommand( "say", "/buyammo "..ent.ammoType )
 				elseif table.HasValue( CustomVehicles, ent ) then
 					RunConsoleCommand( "DarkRP", "buyvehicle", ent.name )
 				end
@@ -2242,11 +2236,6 @@ local function OpenRPMenu()
 	
 end
 
-hook.Add("PlayerBindPress", "DarkRPF4Bind", function(ply, bind, pressed)
-	if string.find(bind, "gm_showspare2", 1, true) then
-		F4Bind = input.KeyNameToNumber(input.LookupBinding(bind))
-		OpenRPMenu()
-	end
+timer.Simple(0.7, function()
+	GAMEMODE.ShowSpare2 = OpenRPMenu
 end)
-
-

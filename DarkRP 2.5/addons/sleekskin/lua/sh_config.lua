@@ -27,9 +27,9 @@ SSK.ShowDonatorEntitiesToAll = false
 
 --Access to certain commands, make sure you add commas!
 
-AccessToCPCmds = { TEAM_POLICE, TEAM_CHIEF }
+AccessToCPCmds = { "Civil Protection", "Civil Protection Chief" }
 
-AccessToMayorCmds = { TEAM_MAYOR }
+AccessToMayorCmds = { "Mayor" }
 
 
 

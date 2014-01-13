@@ -115,6 +115,46 @@ surface.CreateFont( "maxjob", {
  antialias = true
 } )
 
+surface.CreateFont( "VoteFont", {
+ font = "Bebas Neue",
+ size = 24,
+ weight = 500,
+ blursize = 0,
+ scanlines = 0,
+ antialias = true
+} )
+
+surface.CreateFont( "QuestionFont", {
+ font = "Myriad Pro",
+ size = 14,
+ weight = 0,
+ blursize = 0,
+ scanlines = 0,
+ antialias = true
+} )
+
+surface.CreateFont( "TimeFont", {
+ font = "Calibri",
+ size = 22,
+ weight = 0,
+ blursize = 0,
+ scanlines = 0,
+ antialias = true
+} )
+
+surface.CreateFont( "YNButtonFont", {
+ font = "Cabin",
+ size = 12,
+ weight = 500,
+ blursize = 0,
+ scanlines = 0,
+ antialias = true
+} )
+
+local QuestionVGUI = {}
+local PanelNum = 0
+local VoteVGUI = {}
+
 local textOpen = false
 
 
@@ -495,7 +535,7 @@ function OpenRPMenu()
 	local jobs = team.GetAllTeams()
 	
 	local bg = vgui.Create( "DFrame" )
-	bg:SetSize( 800, 500 )
+	bg:SetSize( ScrW() - 500, ScrH() - 200 )
 	bg:Center()
 	bg:MakePopup()
 	bg:SetDraggable( false )
@@ -1694,7 +1734,9 @@ function OpenRPMenu()
 			elseif table.HasValue( CustomShipments, ent ) then
 				weplist:AddItem( jobc )
 			elseif table.HasValue( CustomVehicles, ent ) then
-				vehlist:AddItem( jobc )
+				if SSK.EnableVehiclesTab then
+					vehlist:AddItem( jobc )
+				end
 			else
 				otlist:AddItem( jobc )
 			end
@@ -2087,48 +2129,48 @@ function OpenRPMenu()
 		ehover = false
 	end
 	
-	local fp = vgui.Create( "Panel", cf )
-	fp:SetSize( cp:GetWide(), 54 )
-	fp:SetPos( 1, 248 )
-	fp.Paint = function( self, w, h )
-		if fhover then
-			draw.RoundedBox( 0, 0, 0, w, h, Color( 87, 92, 104 ) )
+	if SSK.EnableForumButton then
+		local fp = vgui.Create( "Panel", cf )
+		fp:SetSize( cp:GetWide(), 54 )
+		fp:SetPos( 1, 248 )
+		fp.Paint = function( self, w, h )
+			if fhover then
+				draw.RoundedBox( 0, 0, 0, w, h, Color( 87, 92, 104 ) )
+				
+				surface.SetDrawColor( Color( 73, 78, 87, 255 ) )
+				surface.DrawLine( 1, 0, 200, 0 )
 			
-			surface.SetDrawColor( Color( 73, 78, 87, 255 ) )
-			surface.DrawLine( 1, 0, 200, 0 )
-		
-			surface.SetDrawColor( Color( 79, 83, 93, 255 ) )
-			surface.DrawLine( 1, 1, 200, 1 )
-		
-			surface.SetDrawColor( Color( 83, 88, 99, 255 ) )
-			surface.DrawLine( 1, 2, 200, 2 )
-		elseif fclick then
-			draw.RoundedBox( 0, 0, 0, w, h, Color( 87, 92, 104 ) )
+				surface.SetDrawColor( Color( 79, 83, 93, 255 ) )
+				surface.DrawLine( 1, 1, 200, 1 )
 			
-			surface.SetDrawColor( Color( 73, 78, 87, 255 ) )
-			surface.DrawLine( 1, 0, 200, 0 )
-		
-			surface.SetDrawColor( Color( 79, 83, 93, 255 ) )
-			surface.DrawLine( 1, 1, 200, 1 )
-		
-			surface.SetDrawColor( Color( 83, 88, 99, 255 ) )
-			surface.DrawLine( 1, 2, 200, 2 )
-		else
-			draw.RoundedBox( 0, 0, 0, w, h, Color( 80, 84, 96 ) )
-		
-			surface.SetDrawColor( Color( 92, 98, 109, 255 ) )
-			surface.DrawLine( 0, 0, 0, 54 )
+				surface.SetDrawColor( Color( 83, 88, 99, 255 ) )
+				surface.DrawLine( 1, 2, 200, 2 )
+			elseif fclick then
+				draw.RoundedBox( 0, 0, 0, w, h, Color( 87, 92, 104 ) )
+				
+				surface.SetDrawColor( Color( 73, 78, 87, 255 ) )
+				surface.DrawLine( 1, 0, 200, 0 )
 			
-			surface.SetDrawColor( Color( 93, 99, 111, 255 ) )
-			surface.DrawLine( 1, 0, 200, 0 )
+				surface.SetDrawColor( Color( 79, 83, 93, 255 ) )
+				surface.DrawLine( 1, 1, 200, 1 )
+			
+				surface.SetDrawColor( Color( 83, 88, 99, 255 ) )
+				surface.DrawLine( 1, 2, 200, 2 )
+			else
+				draw.RoundedBox( 0, 0, 0, w, h, Color( 80, 84, 96 ) )
+			
+				surface.SetDrawColor( Color( 92, 98, 109, 255 ) )
+				surface.DrawLine( 0, 0, 0, 54 )
+				
+				surface.SetDrawColor( Color( 93, 99, 111, 255 ) )
+				surface.DrawLine( 1, 0, 200, 0 )
+			end
+			
+			draw.SimpleText( "Forum", "sidefont", 22, 17, Color( 255, 255, 255, 255 ) )
+			
+			surface.SetDrawColor( Color( 51, 54, 58, 255 ) )
+			surface.DrawLine( 0, 51, 200, 51 )
 		end
-		
-		draw.SimpleText( "Forum", "sidefont", 22, 17, Color( 255, 255, 255, 255 ) )
-		
-		surface.SetDrawColor( Color( 51, 54, 58, 255 ) )
-		surface.DrawLine( 0, 51, 200, 51 )
-		
-		
 	end
 	
 	local fb = vgui.Create( "DButton", cf )
@@ -2153,48 +2195,48 @@ function OpenRPMenu()
 		fhover = false
 	end
 	
-	local DP = vgui.Create( "Panel", cf )
-	DP:SetSize( cp:GetWide(), 54 )
-	DP:SetPos( 1, 248 + 52 )
-	DP.Paint = function( self, w, h )
-		if dhover then
-			draw.RoundedBox( 0, 0, 0, w, h, Color( 87, 92, 104 ) )
+	if SSK.EnableDonateButton then
+		local DP = vgui.Create( "Panel", cf )
+		DP:SetSize( cp:GetWide(), 54 )
+		DP:SetPos( 1, 248 + 52 )
+		DP.Paint = function( self, w, h )
+			if dhover then
+				draw.RoundedBox( 0, 0, 0, w, h, Color( 87, 92, 104 ) )
+				
+				surface.SetDrawColor( Color( 73, 78, 87, 255 ) )
+				surface.DrawLine( 1, 0, 200, 0 )
 			
-			surface.SetDrawColor( Color( 73, 78, 87, 255 ) )
-			surface.DrawLine( 1, 0, 200, 0 )
-		
-			surface.SetDrawColor( Color( 79, 83, 93, 255 ) )
-			surface.DrawLine( 1, 1, 200, 1 )
-		
-			surface.SetDrawColor( Color( 83, 88, 99, 255 ) )
-			surface.DrawLine( 1, 2, 200, 2 )
-		elseif dclick then
-			draw.RoundedBox( 0, 0, 0, w, h, Color( 87, 92, 104 ) )
+				surface.SetDrawColor( Color( 79, 83, 93, 255 ) )
+				surface.DrawLine( 1, 1, 200, 1 )
 			
-			surface.SetDrawColor( Color( 73, 78, 87, 255 ) )
-			surface.DrawLine( 1, 0, 200, 0 )
-		
-			surface.SetDrawColor( Color( 79, 83, 93, 255 ) )
-			surface.DrawLine( 1, 1, 200, 1 )
-		
-			surface.SetDrawColor( Color( 83, 88, 99, 255 ) )
-			surface.DrawLine( 1, 2, 200, 2 )
-		else
-			draw.RoundedBox( 0, 0, 0, w, h, Color( 80, 84, 96 ) )
-		
-			surface.SetDrawColor( Color( 92, 98, 109, 255 ) )
-			surface.DrawLine( 0, 0, 0, 54 )
+				surface.SetDrawColor( Color( 83, 88, 99, 255 ) )
+				surface.DrawLine( 1, 2, 200, 2 )
+			elseif dclick then
+				draw.RoundedBox( 0, 0, 0, w, h, Color( 87, 92, 104 ) )
+				
+				surface.SetDrawColor( Color( 73, 78, 87, 255 ) )
+				surface.DrawLine( 1, 0, 200, 0 )
 			
-			surface.SetDrawColor( Color( 93, 99, 111, 255 ) )
-			surface.DrawLine( 1, 0, 200, 0 )
+				surface.SetDrawColor( Color( 79, 83, 93, 255 ) )
+				surface.DrawLine( 1, 1, 200, 1 )
+			
+				surface.SetDrawColor( Color( 83, 88, 99, 255 ) )
+				surface.DrawLine( 1, 2, 200, 2 )
+			else
+				draw.RoundedBox( 0, 0, 0, w, h, Color( 80, 84, 96 ) )
+			
+				surface.SetDrawColor( Color( 92, 98, 109, 255 ) )
+				surface.DrawLine( 0, 0, 0, 54 )
+				
+				surface.SetDrawColor( Color( 93, 99, 111, 255 ) )
+				surface.DrawLine( 1, 0, 200, 0 )
+			end
+			
+			draw.SimpleText( "Donate", "sidefont", 22, 17, Color( 255, 255, 255, 255 ) )
+			
+			surface.SetDrawColor( Color( 51, 54, 58, 255 ) )
+			surface.DrawLine( 0, 51, 200, 51 )
 		end
-		
-		draw.SimpleText( "Donate", "sidefont", 22, 17, Color( 255, 255, 255, 255 ) )
-		
-		surface.SetDrawColor( Color( 51, 54, 58, 255 ) )
-		surface.DrawLine( 0, 51, 200, 51 )
-		
-		
 	end
 	
 	local db = vgui.Create( "DButton", cf )
@@ -2235,6 +2277,158 @@ function OpenRPMenu()
 	OpenCmds()
 	
 end
+
+local function MsgDoVote(msg)
+	local _, chatY = chat.GetChatBoxPos()
+
+	local question = msg:ReadString()
+	local voteid = msg:ReadShort()
+	local timeleft = msg:ReadFloat()
+	if timeleft == 0 then
+		timeleft = 100
+	end
+	local OldTime = CurTime()
+	if not IsValid(LocalPlayer()) then return end -- Sent right before player initialisation
+
+	LocalPlayer():EmitSound("Town.d1_town_02_elevbell1", 100, 100)
+	local panel = vgui.Create("DFrame")
+	panel:SetPos(10 + PanelNum, chatY - 145)
+	panel:SetTitle("")
+	panel:SetSize(150, 150)
+	panel:SetSizable(false)
+	panel.btnClose:SetVisible(false)
+	panel:SetDraggable(false)
+	function panel:Close()
+		PanelNum = PanelNum - 140
+		VoteVGUI[voteid .. "vote"] = nil
+
+		local num = 0
+		for k,v in SortedPairs(VoteVGUI) do
+			v:SetPos(num, ScrH() / 2 - 50)
+			num = num + 140
+		end
+
+		for k,v in SortedPairs(QuestionVGUI) do
+			v:SetPos(num, ScrH() / 2 - 50)
+			num = num + 300
+		end
+		self:Remove()
+	end
+
+	function panel:Think()
+		if timeleft - (CurTime() - OldTime) <= 0 then
+			panel:Close()
+		end
+	end
+	panel.Paint = function( self, w, h )
+		
+		draw.RoundedBox( 0, 0, 0, w, h, Color( 224, 224, 224, 255 ) )
+		draw.RoundedBox( 0, 1, 1, w - 2, h - 2, Color( 250, 250, 250, 255 ) )
+		
+		draw.RoundedBox( 0, 0, 0, w, 36, Color( 62, 67, 77 ) )
+		
+		draw.SimpleText( "Job Vote", "VoteFont", 6, 7, Color( 255, 255, 255, 255 ) )
+		
+		surface.SetDrawColor( Color( 84, 89, 100, 255 ) )
+		surface.DrawLine( 1, 1, w - 1, 1 )
+		surface.DrawLine( 1, 1, 1, 20 )
+		surface.DrawLine( 1, 34, w - 1, 34 )
+		surface.DrawLine( w - 1, 1, w - 1, 34 )
+		
+		local time = "Time: ".. tostring(math.Clamp(math.ceil(timeleft - (CurTime() - OldTime)), 0, 9999))
+		draw.SimpleText( time, "VoteFont", w - 6, 7, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT )
+	end
+
+	panel:SetKeyboardInputEnabled(false)
+	panel:SetMouseInputEnabled(true)
+	panel:SetVisible(true)
+
+	for i = 22, string.len(question), 22 do
+		if not string.find(string.sub(question, i - 20, i), "\n", 1, true) then
+			question = string.sub(question, 1, i) .. "\n".. string.sub(question, i + 1, string.len(question))
+		end
+	end
+
+	local label = vgui.Create("DLabel")
+	label:SetParent(panel)
+	label:SetPos(5, 42)
+	label:SetFont( "QuestionFont" )
+	label:SetText(question)
+	label:SetTextColor( Color( 0, 0, 0, 255 ) )
+	label:SizeToContents()
+	label:SetVisible(true)
+
+	local nextHeight = label:GetTall() > 78 and label:GetTall() - 78 or 0 // make panel taller for divider and buttons
+	panel:SetTall(panel:GetTall() + nextHeight)
+
+	local ybutton = vgui.Create("Button")
+	ybutton:SetParent(panel)
+	ybutton:SetPos(panel:GetWide() / 2 - 40 - 5, panel:GetTall() - 25)
+	ybutton:SetSize(40, 20)
+	ybutton:SetCommand("!")
+	ybutton:SetText(DarkRP.getPhrase("yes"))
+	ybutton:SetVisible(true)
+	ybutton:SetFont( "YNButtonFont" )
+	ybutton:SetTextColor( Color(255,255,255) )
+	ybutton.DoClick = function()
+		LocalPlayer():ConCommand("vote " .. voteid .. " yea\n")
+		panel:Close()
+	end
+	ybutton.Paint = function( self, w, h )
+		local gcol
+		if self.hover then
+			gcol = Color( 36, 190, 255 )
+		else
+			gcol = Color( 36, 165, 221 )
+		end
+		draw.RoundedBox( 0, 0, 0, w, h, Color( 16, 96, 130 ) )
+		draw.RoundedBox( 0, 1, 1, w - 2, h - 2, gcol )
+	end
+	ybutton.OnCursorEntered = function( self )
+		self.hover = true
+	end
+	ybutton.OnCursorExited = function( self )
+		self.hover = false
+	end
+
+	local nbutton = vgui.Create("Button")
+	nbutton:SetParent(panel)
+	nbutton:SetPos(panel:GetWide() / 2 + 5, panel:GetTall() - 25)
+	nbutton:SetSize(40, 20)
+	nbutton:SetCommand("!")
+	nbutton:SetText(DarkRP.getPhrase("no"))
+	nbutton:SetVisible(true)
+	nbutton:SetFont( "YNButtonFont" )
+	nbutton:SetTextColor( Color(255,255,255) )
+	nbutton.DoClick = function()
+		LocalPlayer():ConCommand("vote " .. voteid .. " nay\n")
+		panel:Close()
+	end
+	nbutton.Paint = function( self, w, h )
+		local gcol
+		if self.hover then
+			gcol = Color( 36, 190, 255 )
+		else
+			gcol = Color( 36, 165, 221 )
+		end
+		draw.RoundedBox( 0, 0, 0, w, h, Color( 16, 96, 130 ) )
+		draw.RoundedBox( 0, 1, 1, w - 2, h - 2, gcol )
+	end
+	nbutton.OnCursorEntered = function( self )
+		self.hover = true
+	end
+	nbutton.OnCursorExited = function( self )
+		self.hover = false
+	end
+
+	PanelNum = PanelNum + 140
+	VoteVGUI[voteid .. "vote"] = panel
+	panel:SetSkin(GAMEMODE.Config.DarkRPSkin)
+end
+
+timer.Simple(0.7, function()
+	usermessage.Hook("DoVote", MsgDoVote)
+end)
 
 timer.Simple(0.7, function()
 	GAMEMODE.ShowSpare2 = OpenRPMenu

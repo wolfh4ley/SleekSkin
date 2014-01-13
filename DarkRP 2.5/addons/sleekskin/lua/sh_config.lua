@@ -25,6 +25,13 @@ SSK.DonateURL = "http://google.com"
 --Whether or not to show donator only entities to all players
 SSK.ShowDonatorEntitiesToAll = false
 
+--Whether or not to show the vehicles tab in the entities tab
+SSK.EnableVehiclesTab = true
+--Whether or not to show the forum button on the sidebar
+SSK.EnableForumButton = true
+--Whether or not to show the donate button on the sidebar
+SSK.EnableDonateButton = true
+
 --Access to certain commands, make sure you add commas!
 
 AccessToCPCmds = { "Civil Protection", "Civil Protection Chief" }

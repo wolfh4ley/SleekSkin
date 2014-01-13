@@ -10,5 +10,5 @@ if SERVER then
 	include("sh_config.lua" )
 else
 	include( "cl_init.lua" )
-	include( "sh_config.lua" )
+	include("sh_config.lua" )
 end

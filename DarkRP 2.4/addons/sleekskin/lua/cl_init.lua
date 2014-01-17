@@ -2628,7 +2628,7 @@ end
 
 hook.Add( "InitPostEntity", "OverrideVote", function()
 	usermessage.Hook("DoVote", MsgDoVote)
-	usermessage.Hook("KeysMenu", OpenKeyMenu)
+	--usermessage.Hook("KeysMenu", OpenKeyMenu)
 	GAMEMODE.ShowSpare2 = OpenRPMenu
-	GAMEMODE.ShowTeam = OpenKeyMenu
+	--GAMEMODE.ShowTeam = OpenKeyMenu
 end )

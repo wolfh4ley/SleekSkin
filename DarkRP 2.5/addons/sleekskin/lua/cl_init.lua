@@ -1198,8 +1198,7 @@ function OpenRPMenu()
 				surface.DrawLine( w - 2, 1, w - 2, 20 )
 			end
 			afj.DoClick = function( self )
-			
-				if type(v.model) == "table" and table.Count( v.model ) > 1 then
+				if type(v.model) == "table" and table.Count( v.model ) > 1 and (not isfunction(v.PlayerSetModel) or not v.PlayerSetModel(LocalPlayer())) then
 					local CH_MAIN = vgui.Create( "DFrame" )
 					CH_MAIN:SetSize( 400, 500 )
 					CH_MAIN:Center()

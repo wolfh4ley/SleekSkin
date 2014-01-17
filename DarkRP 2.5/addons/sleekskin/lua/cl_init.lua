@@ -2292,7 +2292,7 @@ local function MsgDoVote(msg)
 
 	LocalPlayer():EmitSound("Town.d1_town_02_elevbell1", 100, 100)
 	local panel = vgui.Create("DFrame")
-	panel:SetPos(10 + PanelNum, chatY - 145)
+	panel:SetPos(30 + PanelNum, chatY - 145)
 	panel:SetTitle("")
 	panel:SetSize(150, 150)
 	panel:SetSizable(false)

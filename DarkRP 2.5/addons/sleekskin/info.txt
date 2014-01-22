@@ -1,12 +1,12 @@
 "AddonInfo"
 {
-	"name"				""
-	"version"			""
+	"name"				"SleekSkin"
+	"version"			"2.4.1"
 	"up_date"			""
-	"author_name"			""
+	"author_name"			"Wolf Halez"
 	"author_email"			""
 	"author_url"			""
-	"info"				""
+	"info"				"A reskin for all of the default derma panels in DarkRP."
 }
 
 

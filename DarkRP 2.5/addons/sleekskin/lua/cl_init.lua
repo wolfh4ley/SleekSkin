@@ -1730,9 +1730,7 @@ function OpenRPMenu()
 			elseif table.HasValue( CustomShipments, ent ) then
 				weplist:AddItem( jobc )
 			elseif table.HasValue( CustomVehicles, ent ) then
-				if SSK.EnableVehiclesTab then
-					vehlist:AddItem( jobc )
-				end
+				vehlist:AddItem( jobc )
 			else
 				otlist:AddItem( jobc )
 			end
@@ -2125,48 +2123,46 @@ function OpenRPMenu()
 		ehover = false
 	end
 	
-	if SSK.EnableForumButton then
-		local fp = vgui.Create( "Panel", cf )
-		fp:SetSize( cp:GetWide(), 54 )
-		fp:SetPos( 1, 248 )
-		fp.Paint = function( self, w, h )
-			if fhover then
-				draw.RoundedBox( 0, 0, 0, w, h, Color( 87, 92, 104 ) )
-				
-				surface.SetDrawColor( Color( 73, 78, 87, 255 ) )
-				surface.DrawLine( 1, 0, 200, 0 )
+	local fp = vgui.Create( "Panel", cf )
+	fp:SetSize( cp:GetWide(), 54 )
+	fp:SetPos( 1, 248 )
+	fp.Paint = function( self, w, h )
+		if fhover then
+			draw.RoundedBox( 0, 0, 0, w, h, Color( 87, 92, 104 ) )
 			
-				surface.SetDrawColor( Color( 79, 83, 93, 255 ) )
-				surface.DrawLine( 1, 1, 200, 1 )
+			surface.SetDrawColor( Color( 73, 78, 87, 255 ) )
+			surface.DrawLine( 1, 0, 200, 0 )
+		
+			surface.SetDrawColor( Color( 79, 83, 93, 255 ) )
+			surface.DrawLine( 1, 1, 200, 1 )
+		
+			surface.SetDrawColor( Color( 83, 88, 99, 255 ) )
+			surface.DrawLine( 1, 2, 200, 2 )
+		elseif fclick then
+			draw.RoundedBox( 0, 0, 0, w, h, Color( 87, 92, 104 ) )
 			
-				surface.SetDrawColor( Color( 83, 88, 99, 255 ) )
-				surface.DrawLine( 1, 2, 200, 2 )
-			elseif fclick then
-				draw.RoundedBox( 0, 0, 0, w, h, Color( 87, 92, 104 ) )
-				
-				surface.SetDrawColor( Color( 73, 78, 87, 255 ) )
-				surface.DrawLine( 1, 0, 200, 0 )
+			surface.SetDrawColor( Color( 73, 78, 87, 255 ) )
+			surface.DrawLine( 1, 0, 200, 0 )
+		
+			surface.SetDrawColor( Color( 79, 83, 93, 255 ) )
+			surface.DrawLine( 1, 1, 200, 1 )
+		
+			surface.SetDrawColor( Color( 83, 88, 99, 255 ) )
+			surface.DrawLine( 1, 2, 200, 2 )
+		else
+			draw.RoundedBox( 0, 0, 0, w, h, Color( 80, 84, 96 ) )
+		
+			surface.SetDrawColor( Color( 92, 98, 109, 255 ) )
+			surface.DrawLine( 0, 0, 0, 54 )
 			
-				surface.SetDrawColor( Color( 79, 83, 93, 255 ) )
-				surface.DrawLine( 1, 1, 200, 1 )
-			
-				surface.SetDrawColor( Color( 83, 88, 99, 255 ) )
-				surface.DrawLine( 1, 2, 200, 2 )
-			else
-				draw.RoundedBox( 0, 0, 0, w, h, Color( 80, 84, 96 ) )
-			
-				surface.SetDrawColor( Color( 92, 98, 109, 255 ) )
-				surface.DrawLine( 0, 0, 0, 54 )
-				
-				surface.SetDrawColor( Color( 93, 99, 111, 255 ) )
-				surface.DrawLine( 1, 0, 200, 0 )
-			end
-			
-			draw.SimpleText( "Forum", "sidefont", 22, 17, Color( 255, 255, 255, 255 ) )
-			
-			surface.SetDrawColor( Color( 51, 54, 58, 255 ) )
-			surface.DrawLine( 0, 51, 200, 51 )
+			surface.SetDrawColor( Color( 93, 99, 111, 255 ) )
+			surface.DrawLine( 1, 0, 200, 0 )
 		end
+		
+		draw.SimpleText( "Forum", "sidefont", 22, 17, Color( 255, 255, 255, 255 ) )
+		
+		surface.SetDrawColor( Color( 51, 54, 58, 255 ) )
+		surface.DrawLine( 0, 51, 200, 51 )
 	end
 	
 	local fb = vgui.Create( "DButton", cf )
@@ -2191,48 +2187,46 @@ function OpenRPMenu()
 		fhover = false
 	end
 	
-	if SSK.EnableDonateButton then
-		local DP = vgui.Create( "Panel", cf )
-		DP:SetSize( cp:GetWide(), 54 )
-		DP:SetPos( 1, 248 + 52 )
-		DP.Paint = function( self, w, h )
-			if dhover then
-				draw.RoundedBox( 0, 0, 0, w, h, Color( 87, 92, 104 ) )
-				
-				surface.SetDrawColor( Color( 73, 78, 87, 255 ) )
-				surface.DrawLine( 1, 0, 200, 0 )
+	local DP = vgui.Create( "Panel", cf )
+	DP:SetSize( cp:GetWide(), 54 )
+	DP:SetPos( 1, 248 + 52 )
+	DP.Paint = function( self, w, h )
+		if dhover then
+			draw.RoundedBox( 0, 0, 0, w, h, Color( 87, 92, 104 ) )
 			
-				surface.SetDrawColor( Color( 79, 83, 93, 255 ) )
-				surface.DrawLine( 1, 1, 200, 1 )
+			surface.SetDrawColor( Color( 73, 78, 87, 255 ) )
+			surface.DrawLine( 1, 0, 200, 0 )
+		
+			surface.SetDrawColor( Color( 79, 83, 93, 255 ) )
+			surface.DrawLine( 1, 1, 200, 1 )
+		
+			surface.SetDrawColor( Color( 83, 88, 99, 255 ) )
+			surface.DrawLine( 1, 2, 200, 2 )
+		elseif dclick then
+			draw.RoundedBox( 0, 0, 0, w, h, Color( 87, 92, 104 ) )
 			
-				surface.SetDrawColor( Color( 83, 88, 99, 255 ) )
-				surface.DrawLine( 1, 2, 200, 2 )
-			elseif dclick then
-				draw.RoundedBox( 0, 0, 0, w, h, Color( 87, 92, 104 ) )
-				
-				surface.SetDrawColor( Color( 73, 78, 87, 255 ) )
-				surface.DrawLine( 1, 0, 200, 0 )
+			surface.SetDrawColor( Color( 73, 78, 87, 255 ) )
+			surface.DrawLine( 1, 0, 200, 0 )
+		
+			surface.SetDrawColor( Color( 79, 83, 93, 255 ) )
+			surface.DrawLine( 1, 1, 200, 1 )
+		
+			surface.SetDrawColor( Color( 83, 88, 99, 255 ) )
+			surface.DrawLine( 1, 2, 200, 2 )
+		else
+			draw.RoundedBox( 0, 0, 0, w, h, Color( 80, 84, 96 ) )
+		
+			surface.SetDrawColor( Color( 92, 98, 109, 255 ) )
+			surface.DrawLine( 0, 0, 0, 54 )
 			
-				surface.SetDrawColor( Color( 79, 83, 93, 255 ) )
-				surface.DrawLine( 1, 1, 200, 1 )
-			
-				surface.SetDrawColor( Color( 83, 88, 99, 255 ) )
-				surface.DrawLine( 1, 2, 200, 2 )
-			else
-				draw.RoundedBox( 0, 0, 0, w, h, Color( 80, 84, 96 ) )
-			
-				surface.SetDrawColor( Color( 92, 98, 109, 255 ) )
-				surface.DrawLine( 0, 0, 0, 54 )
-				
-				surface.SetDrawColor( Color( 93, 99, 111, 255 ) )
-				surface.DrawLine( 1, 0, 200, 0 )
-			end
-			
-			draw.SimpleText( "Donate", "sidefont", 22, 17, Color( 255, 255, 255, 255 ) )
-			
-			surface.SetDrawColor( Color( 51, 54, 58, 255 ) )
-			surface.DrawLine( 0, 51, 200, 51 )
+			surface.SetDrawColor( Color( 93, 99, 111, 255 ) )
+			surface.DrawLine( 1, 0, 200, 0 )
 		end
+		
+		draw.SimpleText( "Donate", "sidefont", 22, 17, Color( 255, 255, 255, 255 ) )
+		
+		surface.SetDrawColor( Color( 51, 54, 58, 255 ) )
+		surface.DrawLine( 0, 51, 200, 51 )
 	end
 	
 	local db = vgui.Create( "DButton", cf )
@@ -2666,12 +2660,6 @@ end
 hook.Add( "InitPostEntity", "OverrideVote", function()
 	usermessage.Hook("DoVote", MsgDoVote)
 	usermessage.Hook("KeysMenu", OpenKeyMenu)
-	GAMEMODE.ShowSpare2 = function()
-		if isOpen then
-			bg:Close()
-		else
-			OpenRPMenu()
-		end
-	end
+	GAMEMODE.ShowSpare2 = OpenRPMenu
 	GAMEMODE.ShowTeam = OpenKeyMenu
 end ) 

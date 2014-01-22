@@ -528,13 +528,15 @@ local function HasStuff( list )
 		
 local BACKGROUND
 
+local bg
+
 function OpenRPMenu()
 
 	isOpen = true
 
 	local jobs = team.GetAllTeams()
 	
-	local bg = vgui.Create( "DFrame" )
+	bg = vgui.Create( "DFrame" )
 	bg:SetSize( ScrW() * 0.70, ScrH() * 0.70 )
 	bg:Center()
 	bg:MakePopup()
@@ -1152,17 +1154,11 @@ function OpenRPMenu()
 			icon:SetModel(IconModel)
 			icon:SetSize( 100, 100 )
 			local ent = icon:GetEntity()
-			if ent:GetBonePosition(ent:LookupBone("ValveBiped.Bip01_Head1")) then
-				local headPos = ent:GetBonePosition(ent:LookupBone("ValveBiped.Bip01_Head1"))
-				icon:SetLookAt(headPos) -- look at the head of the model
-			else
-				icon:SetCamPos(Vector(30, 10, 75))
-			end
-            ent:SetEyeTarget(Vector(20, 00, 65)) -- otherwise the model will have its eyes pointing down
-            icon:SetCamPos(Vector(20, 00, 65))
+			icon:SetCamPos(Vector(30, 10, 75))
+            ent:SetEyeTarget(Vector(20, 00, 65))
                        
             icon:SetAnimated(false)
-            function icon:LayoutEntity() end --disable rotation
+            function icon:LayoutEntity() end
 			local oldpaint = icon.Paint
 			function icon:Paint()
 				
@@ -1198,7 +1194,8 @@ function OpenRPMenu()
 				surface.DrawLine( w - 2, 1, w - 2, 20 )
 			end
 			afj.DoClick = function( self )
-				if type(v.model) == "table" and table.Count( v.model ) > 1 and (not isfunction(v.PlayerSetModel) or not v.PlayerSetModel(LocalPlayer())) then
+			
+				if type(v.model) == "table" and table.Count( v.model ) > 1 then
 					local CH_MAIN = vgui.Create( "DFrame" )
 					CH_MAIN:SetSize( 400, 500 )
 					CH_MAIN:Center()
@@ -2669,6 +2666,12 @@ end
 hook.Add( "InitPostEntity", "OverrideVote", function()
 	usermessage.Hook("DoVote", MsgDoVote)
 	usermessage.Hook("KeysMenu", OpenKeyMenu)
-	GAMEMODE.ShowSpare2 = OpenRPMenu
+	GAMEMODE.ShowSpare2 = function()
+		if isOpen then
+			bg:Close()
+		else
+			OpenRPMenu()
+		end
+	end
 	GAMEMODE.ShowTeam = OpenKeyMenu
 end ) 

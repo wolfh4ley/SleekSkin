@@ -71,9 +71,9 @@ surface.CreateFont( "jobtitlef", {
 } )
 
 surface.CreateFont( "jobmainf", {
- font = "Myriad Pro",
- size = 13,
- weight = 500,
+ font = "Arial",
+ size = 14,
+ weight = 0,
  blursize = 0,
  scanlines = 0,
  antialias = true
@@ -536,11 +536,13 @@ function OpenRPMenu()
 
 	local jobs = team.GetAllTeams()
 	
+	if !bg or !bg:IsValid() then
+	
 	bg = vgui.Create( "DFrame" )
 	bg:SetSize( ScrW() * 0.70, ScrH() * 0.70 )
 	bg:Center()
 	bg:MakePopup()
-	bg:SetDraggable( false )
+	bg:SetDraggable( true )
 	bg.Init = function(self)
 		self.startTime = SysTime()
 	end
@@ -1156,6 +1158,13 @@ function OpenRPMenu()
 			local ent = icon:GetEntity()
 			icon:SetCamPos(Vector(30, 10, 75))
             ent:SetEyeTarget(Vector(20, 00, 65))
+			
+			if ent:GetBonePosition(ent:LookupBone("ValveBiped.Bip01_Head1")) then
+				local headPos = ent:GetBonePosition(ent:LookupBone("ValveBiped.Bip01_Head1"))
+				ent:SetEyeTarget(Vector(20, 00, 65)) -- otherwise the model will have its eyes pointing down
+				icon:SetCamPos(Vector(16, 10, 65))
+				icon:SetLookAt(headPos)
+			end
                        
             icon:SetAnimated(false)
             function icon:LayoutEntity() end
@@ -1788,64 +1797,7 @@ function OpenRPMenu()
 	end
 	
 	local function OpenWebpage( title, webpage )
-		local cm = vgui.Create( "DFrame" )
-	cm:SetSize( 1040, 640 )
-	cm:Center()
-	cm:MakePopup()
-	cm:SetTitle( "" )
-	cm:ShowCloseButton( false )
-	cm.Init = function(self)
-		self.startTime = SysTime()
-	end
-	cm.Paint = function( self, w, h )
-		Derma_DrawBackgroundBlur( self, self.startTime )
-		
-		draw.RoundedBox( 0, 0, 0, w, h, Color( 224, 224, 224, 255 ) )
-		draw.RoundedBox( 0, 1, 1, w - 2, h - 2, Color( 250, 250, 250, 255 ) )
-		
-		draw.RoundedBox( 0, 0, 0, w, 50, Color( 62, 67, 77 ) )
-		
-		draw.SimpleText( title, "boxtitlef", 20, 15, Color( 255, 255, 255, 255 ) )
-		
-		surface.SetDrawColor( Color( 84, 89, 100, 255 ) )
-		surface.DrawLine( 1, 1, w - 1, 1 )
-		surface.DrawLine( 1, 1, 1, 50 )
-		surface.DrawLine( 1, 48, w - 1, 48 )
-		surface.DrawLine( w - 1, 1, w - 1, 48 )
-	end
-	textOpen = true
-	
-	local cl = vgui.Create( "DButton", cm )
-	cl:SetSize( 50, 20 )
-	cl:SetPos( cm:GetWide() - 60, 0 )
-	cl:SetText( "X" )
-	cl:SetFont( "fontclose" )
-	cl:SetTextColor( Color( 255, 255, 255, 255 ) )
-	cl.Paint = function( self, w, h )
-		local kcol
-		if self.hover then
-			kcol = Color( 255, 150, 150, 255 )
-		else
-			kcol = Color( 175, 100, 100 )
-		end
-		draw.RoundedBoxEx( 0, 0, 0, w, h, Color( 255, 150, 150, 255 ), false, false, true, true )
-		draw.RoundedBoxEx( 0, 1, 0, w - 2, h - 1, kcol, false, false, true, true )
-	end
-	cl.DoClick = function()
-		cm:Close()
-		textOpen = false
-	end
-	cl.OnCursorEntered = function( self )
-		self.hover = true
-	end
-	cl.OnCursorExited = function( self )
-		self.hover = false
-	end
-		
-		HTMLTest = vgui.Create("HTML", cm)
-		HTMLTest:SetPos(0,50)
-		HTMLTest:SetSize(cm:GetWide(), cm:GetTall() - 50)
-		HTMLTest:OpenURL(webpage)
+		gui.OpenURL( webpage )
 	end
 	
 	local mclick = false
@@ -2266,6 +2218,10 @@ function OpenRPMenu()
 	end
 	OpenCmds()
 	
+	else
+		bg:Close()
+	end
+	
 end
 
 local function MsgDoVote(msg)
@@ -2657,7 +2613,7 @@ local function OpenKeyMenu(um)
 	Frame:Center()
 end
 
-hook.Add( "InitPostEntity", "OverrideVote", function()
+timer.Simple( 0.7, function()
 	usermessage.Hook("DoVote", MsgDoVote)
 	usermessage.Hook("KeysMenu", OpenKeyMenu)
 	GAMEMODE.ShowSpare2 = OpenRPMenu

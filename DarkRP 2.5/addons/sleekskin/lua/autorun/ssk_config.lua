@@ -1,11 +1,3 @@
-if SERVER then
-	AddCSLuaFile("sv_init.lua")
-	AddCSLuaFile( "cl_init.lua" )
-	include("sv_init.lua" )
-else
-	include( "cl_init.lua" )
-end
-
 SSK = {}
 
 --Names of the tabs on the sidebar
@@ -30,6 +22,7 @@ SSK.ForumURL = "http://google.com"
 SSK.DonateURL = "http://google.com"
 --Whether or not to show donator only entities to all players
 SSK.ShowDonatorEntitiesToAll = false
+SSK.ShowVIPJobsToAll = true
 
 --Access to certain commands, make sure you add commas!
 
@@ -81,11 +74,16 @@ function() OpenPlyReasonBox( [Title of dialog box], [Subheading over dropdown], 
 
 */
 
+WEB_BUTTONS = {}
 MONEYCMD_BUTTONS = {}
 RPCMD_BUTTONS = {}
 CPCMD_BUTTONS = {}
 MAYORCMD_BUTTONS = {}
 OTHERCMD_BUTTONS = {}
+
+local function AddSidebarButton( n, f )
+    table.insert(WEB_BUTTONS, { Title = n, Func = f } )
+end
  
 local function MenuAddMButton( n, f )
     table.insert(MONEYCMD_BUTTONS, { NAME = n, FUNC = f } )
@@ -106,6 +104,10 @@ end
 local function MenuAddOtherButton( n, f )
     table.insert(OTHERCMD_BUTTONS, { NAME = n, FUNC = f } )
 end
+
+--Add Buttons below the divider, web URLs must start with "http://"!
+AddSidebarButton( "Forums", function() OpenWebpage( "http://www.google.com" ) end )
+AddSidebarButton( "Donate", function() OpenWebpage( "http://www.google.com" ) end )
 
 --First Section
 MenuAddMButton( "Give Money To The Player You're Looking At", function() OpenTextBox( "Give Money", "How much money would you like to give to this player?", "/give" ) end )

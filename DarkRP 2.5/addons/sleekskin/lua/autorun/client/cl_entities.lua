@@ -354,6 +354,12 @@ function OpenEnts()
 	for k, v in pairs( CustomVehicles ) do
 		table.insert( allents, v )
 	end
+	
+	if FoodItems and (GAMEMODE.Config.foodspawn or LocalPlayer():Team() == TEAM_COOK) and LocalPlayer():Team() == TEAM_COOK then
+		for k, v in pairs( FoodItems ) do
+			table.insert( allents, v )
+		end
+	end
 
 	for k, v in pairs( allents ) do
 		if !SSK.ShowDonatorEntitiesToAll then

@@ -51,7 +51,11 @@ function OpenWebpage( url )
 	gui.OpenURL( url )
 end
 
+local f4open
+
 function CreateMenu()
+
+	f4open = true
 
 	if F4Menu and IsValid(F4Menu) then
 		F4Menu:Remove()
@@ -302,7 +306,9 @@ function CreateMenu()
 end
 
 local function BuildF4Menu()
-	if F4Menu and F4Menu:IsValid() then
+	if F4Menu and F4Menu:IsValid() and F4Menu:IsVisible() then
+		F4Menu:SetVisible( false )
+	elseif F4Menu and F4Menu:IsValid() and not F4Menu:IsVisible() then
 		F4Menu:SetVisible(true)
 		return
 	end

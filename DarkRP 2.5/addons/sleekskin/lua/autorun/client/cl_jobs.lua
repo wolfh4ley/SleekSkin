@@ -173,7 +173,7 @@ function OpenJobs()
 				end
 				cl.DoClick = function()
 					CH_BG:Close()
-					F4Menu:Close()
+					--F4Menu:Close()
 				end
 				cl.OnCursorEntered = function( self )
 					self.hover = true

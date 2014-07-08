@@ -172,7 +172,7 @@ function OpenJobs()
 					draw.RoundedBoxEx( 0, 1, 0, w - 2, h - 1, kcol, false, false, true, true )
 				end
 				cl.DoClick = function()
-					CH_MAIN:Close()
+					CH_BG:Close()
 					F4Menu:Close()
 				end
 				cl.OnCursorEntered = function( self )

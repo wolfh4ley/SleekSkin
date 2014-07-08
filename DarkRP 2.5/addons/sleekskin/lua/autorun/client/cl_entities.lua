@@ -280,6 +280,8 @@ function OpenEnts()
 				RunConsoleCommand( "DarkRP", "buyammo", ent.ammoType )
 			elseif table.HasValue( CustomVehicles, ent ) then
 				RunConsoleCommand( "DarkRP", "buyvehicle", ent.name )
+			elseif table.HasValue( FoodItems, ent ) then
+				RunConsoleCommand( "say", "/buyfood "..ent.name )
 			end
 		end
 		afj.OnCursorEntered = function( self )
@@ -290,38 +292,39 @@ function OpenEnts()
 		end
 
 		if ent.noship == false and ent.seperate then
-		local single = vgui.Create( "DButton", jobc )
-		single:SetSize( 90, 20 )
-		single:SetPos( jobc:GetWide() - 142, 28 )
-		single:SetText( "Buy Single" )
-		single:SetFont( "buyitemfont" )
-		single:SetTextColor( Color( 255, 255, 255, 255 ) )
-		single.Paint = function( self, w, h )
-			local gcol
-			if self.hover then
-				gcol = Color( 36, 190, 255 )
-			else
-				gcol = Color( 26, 160, 212 )
-			end
-			draw.RoundedBox( 0, 0, 0, w, h, Color( 22, 131, 173 ) )
-			draw.RoundedBox( 0, 1, 1, w - 2, h - 2, gcol )
+			local single = vgui.Create( "DButton", jobc )
+			single:SetSize( 90, 20 )
+			single:SetPos( jobc:GetWide() - 142, 28 )
+			single:SetText( "Buy Single" )
+			single:SetFont( "buyitemfont" )
+			single:SetTextColor( Color( 255, 255, 255, 255 ) )
+			single.Paint = function( self, w, h )
+				local gcol
+				if self.hover then
+					gcol = Color( 36, 190, 255 )
+				else
+					gcol = Color( 26, 160, 212 )
+				end
+				draw.RoundedBox( 0, 0, 0, w, h, Color( 22, 131, 173 ) )
+				draw.RoundedBox( 0, 1, 1, w - 2, h - 2, gcol )
 
-			surface.SetDrawColor( Color( 31, 191, 255, 255 ) )
-			surface.DrawLine( 1, 1, w - 1, 1 )
-			surface.DrawLine( 1, 1, 1, 20 )
-			surface.DrawLine( 1, 18, w - 1, 18 )
-			surface.DrawLine( w - 2, 1, w - 2, 20 )
+				surface.SetDrawColor( Color( 31, 191, 255, 255 ) )
+				surface.DrawLine( 1, 1, w - 1, 1 )
+				surface.DrawLine( 1, 1, 1, 20 )
+				surface.DrawLine( 1, 18, w - 1, 18 )
+				surface.DrawLine( w - 2, 1, w - 2, 20 )
+			end
+			single.DoClick = function()
+				RunConsoleCommand( "say", "/buy "..ent.name )
+				RunConsoleCommand( "DarkRP", ent.cmd )
+			end
+			single.OnCursorEntered = function( self )
+				self.hover = true
+			end
+			single.OnCursorExited = function( self )
+				self.hover = false
+			end
 		end
-		single.DoClick = function()
-			RunConsoleCommand( "say", "/buy "..ent.name )
-		end
-		single.OnCursorEntered = function( self )
-			self.hover = true
-		end
-		single.OnCursorExited = function( self )
-			self.hover = false
-		end
-	end
 
 		if table.HasValue( GAMEMODE.AmmoTypes, ent ) then
 			ammolist:AddItem( jobc )

@@ -123,10 +123,17 @@ function OpenJobs()
 		afj.DoClick = function( self )
 
 			if type(v.model) == "table" and table.Count( v.model ) > 1 then
-				local CH_MAIN = vgui.Create( "DFrame" )
+				local CH_BG = vgui.Create( "DFrame" )
+				CH_BG:SetSize( ScrW(), ScrH() )
+				CH_BG:SetPos( 0, 0 )
+				CH_BG:MakePopup()
+				CH_BG.Paint = function()
+				
+				end
+			
+				local CH_MAIN = vgui.Create( "DFrame", CH_BG )
 				CH_MAIN:SetSize( 400, 500 )
 				CH_MAIN:Center()
-				CH_MAIN:MakePopup()
 				CH_MAIN:SetTitle( "" )
 				CH_MAIN:ShowCloseButton( false )
 				CH_MAIN.Init = function(self)
@@ -166,7 +173,7 @@ function OpenJobs()
 				end
 				cl.DoClick = function()
 					CH_MAIN:Close()
-					bg:Close()
+					F4Menu:Close()
 				end
 				cl.OnCursorEntered = function( self )
 					self.hover = true
@@ -276,12 +283,12 @@ function OpenJobs()
 				CH_OKAY.DoClick = function()
 					if v.vote then
                             if ((v.admin == 0 and LocalPlayer():IsAdmin()) or (v.admin == 1 and LocalPlayer():IsSuperAdmin())) then
-                                    local menu = DermaMenu( CH_MAIN )
-                                    menu:AddOption("Vote", function() RunCmd("/vote"..v.command) CH_MAIN:Close() F4Menu:Remove()
-										CH_MAIN:Close()
+                                    local menu = DermaMenu( CH_BG )
+                                    menu:AddOption("Vote", function() RunCmd("/vote"..v.command) CH_BG:Close() F4Menu:Remove()
+										CH_BG:Close()
 									end)
                                     menu:AddOption("Do not vote", function() RunCmd("/"..v.command)
-										CH_MAIN:Close()
+										CH_BG:Close()
 										F4Menu:Remove() 
 									end)
                                     menu:Open()
@@ -291,7 +298,7 @@ function OpenJobs()
                             end
                     else
 						RunCmd("/" .. v.command)
-						CH_MAIN:Close()
+						CH_BG:Close()
 						F4Menu:Remove()
                     end
 					RunConsoleCommand("rp_playermodel", curModel)

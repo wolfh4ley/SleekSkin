@@ -284,8 +284,8 @@ function OpenJobs()
 					if v.vote then
                             if ((v.admin == 0 and LocalPlayer():IsAdmin()) or (v.admin == 1 and LocalPlayer():IsSuperAdmin())) then
                                     local menu = DermaMenu( CH_BG )
-                                    menu:AddOption("Vote", function() RunCmd("/vote"..v.command) CH_BG:Close() F4Menu:Remove()
-										CH_BG:Close()
+                                    menu:AddOption("Vote", function() RunCmd("/vote"..v.command) CH_BG:Close()
+										F4Menu:Remove()
 									end)
                                     menu:AddOption("Do not vote", function() RunCmd("/"..v.command)
 										CH_BG:Close()

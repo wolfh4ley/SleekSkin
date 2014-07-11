@@ -312,6 +312,7 @@ local function BuildF4Menu()
 		F4Menu:SetVisible(true)
 		return
 	end
+	print( "Making menu" )
 	CreateMenu()
 	OpenCmds()
 	OpenJobs()

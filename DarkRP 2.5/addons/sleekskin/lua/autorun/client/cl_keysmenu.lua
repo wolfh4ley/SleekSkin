@@ -85,7 +85,6 @@ function KeysMenu(um)
 	if KeyFrameVisible then return end
 
 	local ent = LocalPlayer():GetEyeTrace().Entity
-	-- Don't open the menu if the entity is not ownable, the entity is too far away or the door settings are not loaded yet
 	if not IsValid(ent) or not ent:isKeysOwnable() or ent:GetPos():Distance(LocalPlayer():GetPos()) > 200 then return end
 
 	KeyFrameVisible = true
@@ -239,6 +238,7 @@ function KeysMenu(um)
 	Frame:Center()
 end
 
-timer.Simple( 0.7, function()
+timer.Simple( 1, function()
+	print( "Override Keys Menu" )
 	DarkRP.openKeysMenu = KeysMenu
 end )

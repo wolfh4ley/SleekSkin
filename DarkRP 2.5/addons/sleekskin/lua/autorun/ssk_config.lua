@@ -26,9 +26,9 @@ SSK.ShowVIPJobsToAll = true
 
 --Access to certain commands, make sure you add commas!
 
-AccessToCPCmds = { "Civil Protection", "Civil Protection Chief" }
+SSK.AccessToCPCmds = { "Civil Protection", "Civil Protection Chief" }
 
-AccessToMayorCmds = { "Mayor" }
+SSK.AccessToMayorCmds = { "Mayor" }
 
 
 

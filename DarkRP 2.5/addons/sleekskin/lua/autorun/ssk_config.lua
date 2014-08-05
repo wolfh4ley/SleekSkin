@@ -26,9 +26,11 @@ SSK.ShowVIPJobsToAll = true
 
 --Access to certain commands, make sure you add commas!
 
-SSK.AccessToCPCmds = { TEAM_POLICE, TEAM_CHIEF }
+timer.Simple( 1, function()
+    SSK.AccessToCPCmds = { TEAM_POLICE, TEAM_CHIEF }
 
-SSK.AccessToMayorCmds = { TEAM_MAYOR }
+    SSK.AccessToMayorCmds = { TEAM_MAYOR }
+end)
 
 
 

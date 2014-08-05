@@ -281,6 +281,13 @@ function OpenJobs()
 					surface.DrawLine( w - 2, 1, w - 2, 100 )
 				end
 				CH_OKAY.DoClick = function()
+					
+					for _, team in pairs( team.GetAllTeams() ) do
+						if team.Name == v.name then
+							DarkRP.setPreferredJobModel(_, curModel)
+						end
+					end
+					
 					if v.vote then
                             if ((v.admin == 0 and LocalPlayer():IsAdmin()) or (v.admin == 1 and LocalPlayer():IsSuperAdmin())) then
                                     local menu = DermaMenu( CH_BG )

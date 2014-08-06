@@ -238,7 +238,6 @@ function KeysMenu(um)
 	Frame:Center()
 end
 
-timer.Simple( 1, function()
-	print( "Override Keys Menu" )
-	DarkRP.openKeysMenu = KeysMenu
+timer.Create( "KeysOverride", 2, 0, function()
+	GAMEMODE.ShowTeam = KeysMenu
 end )

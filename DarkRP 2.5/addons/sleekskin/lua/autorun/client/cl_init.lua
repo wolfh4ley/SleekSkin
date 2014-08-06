@@ -318,6 +318,6 @@ local function BuildF4Menu()
 	OpenEnts()
 end
 
-timer.Simple( 0.7, function()
+timer.Create( "F4Override", 2, 0, function()
 	GAMEMODE.ShowSpare2 = BuildF4Menu
 end ) 

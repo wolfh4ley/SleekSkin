@@ -60,6 +60,8 @@ function CreateMenu()
 	if F4Menu and IsValid(F4Menu) then
 		F4Menu:Remove()
 	end
+	
+	local createdTime = CurTime()
 
 	F4Menu = vgui.Create('DFrame')
 	F4Menu:SetSize(ScrW() * 0.70, ScrH() * 0.70)
@@ -77,6 +79,17 @@ function CreateMenu()
 	end
 	F4Menu.Paint = function( self, w, h )
 		Derma_DrawBackgroundBlur( self, self.startTime )
+		
+		if input.IsKeyDown(95) then
+			if self.ReadyToClose then
+				self:Remove()
+				return
+			end
+		else
+			if CurTime() - createdTime > 0.2 then
+				self.ReadyToClose = true
+			end
+		end
 	end
 	
 	local SLEEK_SIDEBAR = vgui.Create( "Panel", F4Menu )
